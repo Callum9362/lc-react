@@ -1,4 +1,7 @@
 import '../reset.css';
+import NoTodos from './NoTodos';
+import TodoForm from './TodoForm';
+import TodoList from './TodoList';
 import '../App.css';
 import { useState } from 'react';
 
@@ -24,24 +27,16 @@ function App() {
     },
   ]);
 
-  const [todoInput, setTodoInput] = useState('');
   const [idForTodo, setIdForTodo] = useState(4);
 
-  function addTodo(event) {
+  function addTodo(todo) {
     
-    event.preventDefault();
-
-    if(todoInput.trim().length ===0){
-      return;
-    }
-
     setTodos([...todos, {
       id: idForTodo,
-      title: todoInput,
+      title: todo,
       isComplete: false,
     }]);
 
-    setTodoInput('');
 
     setIdForTodo(prevIdForTodo => prevIdForTodo + 1);
   }
@@ -114,95 +109,31 @@ function App() {
     setTodos(updatedTodos);
   }
 
-  function handleInput(event){
-    setTodoInput(event.target.value);
-  }
-
   return (
     <div className="todo-app-container">
       <div className="todo-app">
         <h2>Todo App</h2>
-        <form action="#" onSubmit={addTodo}>
-          <input
-            type="text"
-            className="todo-input"
-            value={todoInput}
-            onChange={handleInput}
-            placeholder="What do you need to do?"
+        
+        <TodoForm addTodo={addTodo}/>
+
+        { todos.length > 0 ? (
+
+          <TodoList 
+
+          todos={todos} 
+          completeTodo={completeTodo} 
+          markAsEditing={markAsEditing} 
+          updateTodo={updateTodo} 
+          cancelEdit={cancelEdit} 
+          deleteTodo={deleteTodo}
+
           />
-        </form>
 
-        <ul className="todo-list">
-          {todos.map((todo, index) => (
-          <li key={todo.id} className="todo-item-container">
-            <div className="todo-item">
+        ) : (
 
-              <input 
-              type="checkbox" 
-              onChange={() => completeTodo(todo.id)}
-              checked={todo.isComplete ? true : false}/>
-              
-              { !todo.isEditing ?  (
-              <span onDoubleClick={() => markAsEditing(todo.id)} className={`'todo-item-label' ${todo.isComplete ? 'line-through' : ''}`}>{ todo.title} </span>
-              ) : (
-              <input 
-              type="text" 
-              onBlur={(event) => updateTodo(event, todo.id)} 
-              onKeyDown={event => {
-                if(event.key === 'Enter')
-                {
-                  updateTodo(event, todo.id);
-                }
-                else if(event.key === 'Escape')
-                {
-                  cancelEdit(event, todo.id);
-                }
-              }}
-              className="todo-item-input" 
-              defaultValue={todo.title} 
-              autoFocus/>
-              )}
-              
-            </div>
-            <button onClick={() => deleteTodo(todo.id)} className="x-button">
-              <svg
-                className="x-button-icon"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </li>
-          ))}
-        </ul>
-
-        <div className="check-all-container">
-          <div>
-            <div className="button">Check All</div>
-          </div>
-
-          <span>3 items remaining</span>
-        </div>
-
-        <div className="other-buttons-container">
-          <div>
-            <button className="button filter-button filter-button-active">
-              All
-            </button>
-            <button className="button filter-button">Active</button>
-            <button className="button filter-button">Completed</button>
-          </div>
-          <div>
-            <button className="button">Clear completed</button>
-          </div>
-        </div>
+          <NoTodos />
+          
+        )}
       </div>
     </div>
   );
